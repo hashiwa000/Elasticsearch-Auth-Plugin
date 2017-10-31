@@ -33,8 +33,8 @@ public class AuthRestHandler implements RestHandler {
 
   @Override
   public void handleRequest(RestRequest restRequest, RestChannel restChannel, NodeClient nodeClient) throws Exception {
-    this.logger.info(restRequest.path());
-    this.logger.info(restRequest.rawPath());
+    this.logger.debug(restRequest.path());
+    this.logger.debug(restRequest.rawPath());
     if (isOk(restRequest)) {
       this.originalHandler.handleRequest(restRequest, restChannel, nodeClient);
     } else {

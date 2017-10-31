@@ -19,7 +19,8 @@ public class AuthPlugin extends Plugin implements ActionPlugin {
 
   public AuthPlugin(Settings settings) {
     this.settings = settings;
-    this.logger.info(settings.toString());
+    this.logger.info("auth plugin is enabled.");
+    this.logger.debug(settings.toString());
   }
 
 //  @Override
@@ -45,7 +46,7 @@ public class AuthPlugin extends Plugin implements ActionPlugin {
   @Override
   public UnaryOperator<RestHandler> getRestHandlerWrapper(ThreadContext threadContext) {
     return restHandler -> {
-      this.logger.info("in getRestHandlerWrapper: " + restHandler);
+      this.logger.debug("in getRestHandlerWrapper: " + restHandler);
       RestHandler authRestHandler = new AuthRestHandler(restHandler);
       return authRestHandler;
     };
