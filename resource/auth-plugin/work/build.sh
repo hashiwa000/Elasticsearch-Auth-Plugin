@@ -5,5 +5,5 @@ jars="jars=${jars}."
 # echo ${jars}
 rm -rf jp
 javac -d . -cp ${jars} src/*
-jar cvf test-plugin.jar jp
-cp -p test-plugin.jar ..
+jar cvf auth-plugin.jar jp
+cp -p auth-plugin.jar ..
