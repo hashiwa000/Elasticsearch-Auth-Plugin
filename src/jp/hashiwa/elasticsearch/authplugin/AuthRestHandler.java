@@ -7,6 +7,10 @@ import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.rest.*;
 
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
 public class AuthRestHandler implements RestHandler {
   private final Logger logger = Loggers.getLogger(AuthRestHandler.class);
   private final RestHandler originalHandler;
@@ -26,6 +30,20 @@ public class AuthRestHandler implements RestHandler {
       return RestStatus.UNAUTHORIZED;
     }
   };
+  private final Map<RestRequest.Method, Stream<Pattern>> authPatterns = new HashMap<RestRequest.Method, Stream<Pattern>>() {
+    {
+      this.put(RestRequest.Method.POST, Stream.of(
+              Pattern.compile("^/testindex(/.*)?$")
+      ));
+      this.put(RestRequest.Method.PUT, Stream.of(
+              Pattern.compile("^/testindex(/.*)?$")
+      ));
+      // all methods
+      this.put(null, Stream.of(
+              Pattern.compile("^/adminindex(/.*)?$")
+      ));
+    }
+  };
 
   AuthRestHandler(RestHandler restHandler) {
     this.originalHandler = restHandler;
@@ -42,7 +60,26 @@ public class AuthRestHandler implements RestHandler {
     }
   }
 
+  private boolean needAuth(RestRequest.Method method, String path) {
+    if (authPatterns.containsKey(method)) {
+      Stream<Pattern> patterns = authPatterns.get(method);
+      boolean match = patterns.anyMatch(
+              p -> p.matcher(path).matches()
+      );
+      return match;
+    }
+    return false;
+  }
+
   private boolean isOk(RestRequest restRequest) {
+    RestRequest.Method method = restRequest.method();
+    String path = restRequest.path(); // use rawpath() ?
+    boolean needAuth = needAuth(method, path)
+                    || needAuth(null, path);
+    if (! needAuth) {
+      return true;
+    }
+
     for (java.util.Map.Entry<String, String> entry: restRequest.headers()) {
       String key = entry.getKey();
       String value = entry.getValue();
