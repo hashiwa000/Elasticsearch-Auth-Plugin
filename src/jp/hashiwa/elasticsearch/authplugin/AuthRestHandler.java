@@ -22,7 +22,7 @@ public class AuthRestHandler implements RestHandler {
 
     @Override
     public BytesReference content() {
-      return new BytesArray("{\"error\": \"Unauthorized.\"}");
+      return new BytesArray("");
     }
 
     @Override
